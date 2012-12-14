@@ -1,0 +1,2 @@
+python-ldap
+-e git://github.com/rroemhild/pyLDAPHelper.git#egg=ldaphelper
