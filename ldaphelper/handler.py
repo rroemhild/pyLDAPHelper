@@ -22,6 +22,10 @@ import logging
 from ldaphelper.entry import LDAPEntry
 
 
+log = logging.getLogger(__name__)
+log.addHandler(logging.NullHandler())
+
+
 class LDAPHandler(object):
 
     '''
@@ -95,7 +99,7 @@ class LDAPHandler(object):
         Setup the connection to the LDAP server.
         '''
         if not self._ldap:
-            logging.debug('Connect to LDAP Server %s.', self._ldap_uri)
+            log.debug('Connect to LDAP Server %s.', self._ldap_uri)
             ldap.set_option(ldap.OPT_PROTOCOL_VERSION, ldap.VERSION3)
             ldap.set_option(ldap.OPT_DEREF, ldap.DEREF_ALWAYS)
 
@@ -115,13 +119,13 @@ class LDAPHandler(object):
                 ldapcon.simple_bind_s(self._ldap_binddn, self._ldap_secret)
             except ldap.INVALID_CREDENTIALS:
                 self._error = 'Username or password incorrect.'
-                logging.error(self._error)
+                log.error(self._error)
             except ldap.SERVER_DOWN:
                 self._error = 'LDAP Server %s down.' % self._ldap_uri
-                logging.error(self._error)
+                log.error(self._error)
             except ldap.LDAPError, error:
                 self._error = 'LDAP connect error: %s.' % error
-                logging.error(self._error)
+                log.error(self._error)
 
             self._ldap = ldapcon
         # if we are connected, return connection handler
@@ -132,7 +136,7 @@ class LDAPHandler(object):
         Disconnect from the LDAP server.
         '''
         if self._ldap:
-            logging.debug('Disconnect from LDAP Server.')
+            log.debug('Disconnect from LDAP Server.')
             self._ldap.unbind_s()
             self._ldap = None
 
@@ -145,16 +149,16 @@ class LDAPHandler(object):
         :param entry: The LDAPEntry object to modify.
         :param modlist: A modlist from ldap.modlist.modifyModlist
         '''
-        logging.info('Add new LDAP entry: %s.', entry.get_dn())
+        log.info('Add new LDAP entry: %s.', entry.get_dn())
         try:
             self.bind()
             self._ldap.add_s(entry.get_dn(), modlist)
         except ldap.LDAPError, error:
             self._error =  'LDAP add entry error: %s.' % error
-            logging.error(self._error)
+            log.error(self._error)
         except ldap.SERVER_DOWN:
             self._error = 'LDAP Server %s down.' % self._ldap_uri
-            logging.error(self._error)
+            log.error(self._error)
 
     def modify(self, entry, modlist):
         '''
@@ -165,17 +169,17 @@ class LDAPHandler(object):
         :param entry: The LDAPEntry object to modify.
         :param modlist: A modlist from ldap.modlist.modifyModlist
         '''
-        logging.info('Modify existing LDAP entry: %s.', entry.get_dn())
+        log.info('Modify existing LDAP entry: %s.', entry.get_dn())
         try:
             self.bind()
             self._ldap.modify_s(entry.get_dn(), modlist)
         except ldap.REFERRAL, error:
-            logging.error('Can not handle refferral: %s', error)
+            log.error('Can not handle refferral: %s', error)
         except ldap.LDAPError, error:
-            logging.error('LDAP modify entry error: %s.', error)
+            log.error('LDAP modify entry error: %s.', error)
         except ldap.SERVER_DOWN:
             self._error = 'LDAP Server %s down.' % self._ldap_uri
-            logging.error(self._error)
+            log.error(self._error)
 
     def delete(self, entry):
         '''
@@ -194,14 +198,14 @@ class LDAPHandler(object):
             self.bind()
             self._ldap.delete_s(dn)
             self.unbind()
-            logging.info('LDAP entry "%s" removed.', dn)
+            log.info('LDAP entry "%s" removed.', dn)
         except ldap.LDAPError, error:
-            logging.error('LDAP delete error: %s.', error)
+            log.error('LDAP delete error: %s.', error)
         except ldap.DECODING_ERROR:
-            logging.error('%s is not a valid DN.', dn)
+            log.error('%s is not a valid DN.', dn)
         except ldap.SERVER_DOWN:
             self._error = 'LDAP Server %s down.' % self._ldap_uri
-            logging.error(self._error)
+            log.error(self._error)
 
     def rename(self, dn, newrdn, newsuperior=None, delold=1):
         '''
@@ -216,13 +220,13 @@ class LDAPHandler(object):
             self.bind()
             self._ldap.rename_s(dn, newrdn, newsuperior, delold)
             self.unbind()
-            logging.info(
+            log.info(
                 'Renamed dn "%s" to "%s,%s".', dn, newrdn, newsuperior)
         except ldap.LDAPError, error:
-            logging.error('Can not rename dn %s', error)
+            log.error('Can not rename dn %s', error)
         except ldap.SERVER_DOWN:
             self._error = 'LDAP Server %s down.' % self._ldap_uri
-            logging.error(self._error)
+            log.error(self._error)
 
     def search(self, basedn, search_filter='(objectClass=*)',
                retrieve_attrs=list(), search_scope=ldap.SCOPE_SUBTREE,
@@ -238,22 +242,22 @@ class LDAPHandler(object):
         :param raw: Return the raw search result from ldap.search_s().
         '''
         search_result = []
-        logging.debug('Perform LDAP search.')
+        log.debug('Perform LDAP search.')
         try:
             self.bind()
             search_result = self._ldap.search_s(basedn, search_scope,
                                                 search_filter,
                                                 retrieve_attrs)
             self.unbind()
-            logging.debug('LDAP search result: %s.', search_result)
+            log.debug('LDAP search result: %s.', search_result)
         except ldap.FILTER_ERROR, error:
-            logging.error('LDAP searchFilter error: %s.', error)
-            logging.error('searchFilter: %s', search_filter)
+            log.error('LDAP searchFilter error: %s.', error)
+            log.error('searchFilter: %s', search_filter)
         except ldap.PROTOCOL_ERROR, error:
-            logging.error('LDAP Protocol error: %s.', error)
+            log.error('LDAP Protocol error: %s.', error)
         except ldap.SERVER_DOWN:
             self._error = 'LDAP Server %s down.' % self._ldap_uri
-            logging.error(self._error)
+            log.error(self._error)
 
         if raw:
             return search_result
@@ -276,8 +280,8 @@ class LDAPHandler(object):
                 explode_dn = ldap.explode_dn(entry.get_dn())
                 orig_dn = self.search(','.join(explode_dn[1:]), '(%s)' %
                                       explode_dn[:1][0], raw=True)
-            except:
-                logging.error('DN is not valid.')
+            except Exception:
+                log.error('DN is not valid.')
                 # TODO: Raise error
                 return False
 
@@ -289,13 +293,13 @@ class LDAPHandler(object):
                 if modlist:
                     self.modify(entry, modlist)
                 else:
-                    logging.debug('Nothing to modify.')
+                    log.debug('Nothing to modify.')
             else:
                 modlist = ldap.modlist.addModlist(entry._attrs)
                 if modlist:
                     self.add(entry, modlist)
                 else:
-                    logging.debug('Nothing to add.')
+                    log.debug('Nothing to add.')
 
             if self._ldap:
                 self.unbind()

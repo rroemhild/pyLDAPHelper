@@ -20,6 +20,10 @@ import logging
 from ldif import LDIFWriter
 
 
+log = logging.getLogger(__name__)
+log.addHandler(logging.NullHandler())
+
+
 class LDAPEntry(object):
 
     '''
@@ -51,7 +55,7 @@ class LDAPEntry(object):
 
     def _update(self, entry):
         '''
-        Update object with an search result tuple (dn, entry).
+        Update object with a search result tuple (dn, entry).
         '''
         self._dn = entry[0]
         self._attrs.update(entry[1])
@@ -80,10 +84,11 @@ class LDAPEntry(object):
         '''
         try:
             val = self._attrs[attr]
-            if val and len(val) > 0:
-                return val
+            if len(val) < 1:
+                raise KeyError
+            return val
         except KeyError:
-            logging.debug('No attribute: %s in entry.', attr)
+            log.debug('get: Attribute \'%s\' is not defined', attr)
             if isinstance(default, list):
                 return default
             else:
@@ -91,10 +96,10 @@ class LDAPEntry(object):
 
     def set(self, attr, val):
         '''
-        Set an attribute from the entry.
+        Set an attribute.
 
         :param attr: LDAP attribute name
-        :param val: Value to set for he attribute
+        :param val: Value as str or list
         '''
         if isinstance(val, int):
             val = str(val)
@@ -112,10 +117,9 @@ class LDAPEntry(object):
         '''
         try:
             self._attrs[attr].append(val)
-            logging.debug('Removed value: %s from attribute: %s.', attr, val)
+            log.debug('append: Add \'%s\' to \'%s\'.', val, attr)
         except KeyError:
-            logging.error('Can not append value: %s to attribute: %s.' \
-                          ' Attribute does not exists.', val, attr)
+            log.error('append: Attribute \'%s\' is not defined', attr)
             raise KeyError
 
     def remove(self, attr, val):
@@ -125,19 +129,20 @@ class LDAPEntry(object):
         try:
             self._attrs[attr].remove(val)
         except ValueError:
-            logging.error('Value: %s is not in attribute: %s.', attr, val)
+            log.error('remove: Value \'%s\' not in attribute \'%s\'', val, attr)
         except KeyError:
-            logging.error('No attribute: %s in entry.', attr)
+            log.error('remove: Attribute \'%s\' is not defined', attr)
 
     def delete(self, attr):
         '''
         Remove an attribute from the entry.
         '''
         try:
+            if not attr in self._attrs:
+                raise KeyError
             self._attrs[attr] = []
         except KeyError:
-            logging.error('Can not delete attribute: %s. Attribute does' \
-                          'not exist.', attr)
+            log.error('delete: Attribute \'%s\' is not defined', attr)
 
     def attributes(self):
         '''
@@ -152,9 +157,9 @@ class LDAPEntry(object):
         try:
             dn = ldap.dn.str2dn(val)
             self._dn = ldap.dn.dn2str(dn)
-            logging.debug('DN set to: %s.', self._dn)
+            log.debug('set_dn: \'%s\'', self._dn)
         except ldap.DECODING_ERROR:
-            logging.error('Not a valid DN: %s', self._dn)
+            log.error('set_dn: \'%s\' is not a valid DN', self._dn)
 
     def to_ldif(self, output_file=sys.stdout):
         '''
