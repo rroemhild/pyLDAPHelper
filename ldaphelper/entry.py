@@ -88,8 +88,10 @@ class LDAPEntry(object):
                 raise KeyError
             return val
         except KeyError:
-            log.debug('get: Attribute \'%s\' is not defined', attr)
+            log.debug('Attribute \'%s\' is not defined in %s', attr, self._dn)
             if isinstance(default, list):
+                return default
+            elif isinstance(default, bool):
                 return default
             else:
                 return [default]
@@ -116,10 +118,16 @@ class LDAPEntry(object):
         Add a value to an attribute.
         '''
         try:
-            self._attrs[attr].append(val)
-            log.debug('append: Add \'%s\' to \'%s\'.', val, attr)
+            if not attr in self._attrs:
+                self.set(attr, val)
+                log.debug('append: Add new attr \'%s\' with val \'%s\'.',
+                                                                    val, attr)
+            else:
+                self._attrs[attr].append(val)
+                log.debug('append: Add \'%s\' to \'%s\'.', val, attr)
         except KeyError:
-            log.error('append: Attribute \'%s\' is not defined', attr)
+            log.error('append: Attribute \'%s\' is not defined in %s',
+                                                               attr, self._dn)
             raise KeyError
 
     def remove(self, attr, val):
@@ -129,9 +137,11 @@ class LDAPEntry(object):
         try:
             self._attrs[attr].remove(val)
         except ValueError:
-            log.error('remove: Value \'%s\' not in attribute \'%s\'', val, attr)
+            log.error('remove: Value \'%s\' not in attribute \'%s\'',
+                                                                    val, attr)
         except KeyError:
-            log.error('remove: Attribute \'%s\' is not defined', attr)
+            log.error('remove: Attribute \'%s\' is not defined in %s',
+                                                               attr, self._dn)
 
     def delete(self, attr):
         '''
@@ -142,7 +152,8 @@ class LDAPEntry(object):
                 raise KeyError
             self._attrs[attr] = []
         except KeyError:
-            log.error('delete: Attribute \'%s\' is not defined', attr)
+            log.error('delete: Attribute \'%s\' is not defined in %s',
+                                                               attr, self._dn)
 
     def attributes(self):
         '''
