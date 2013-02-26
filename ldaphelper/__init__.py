@@ -17,3 +17,4 @@ from ldaphelper.utils import list_of_attr
 
 
 __all__ = ['LDAPHandler', 'LDAPEntry']
+__version__ = '0.1'
