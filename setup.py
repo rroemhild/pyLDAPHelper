@@ -12,14 +12,13 @@ dealing with LDAP server based on python-ldap.
 :license: MIT, see LICENSE for more details.
 """
 
-import ldaphelper
-
 from setuptools import setup
+from ldaphelper import __version__
 
 
 setup(
     name = 'ldaphelper',
-    version = ldaphelper.__version__,
+    version = __version__,
     author = 'Rafael Römhild',
     author_email = 'rafael@roemhild.de',
     description = 'Simple helper module for python-ldap.',
