@@ -13,7 +13,7 @@ dealing with LDAP server based on python-ldap.
 """
 
 from setuptools import setup
-from ldaphelper import __version__
+from ldaphelper.version import __version__
 
 
 setup(
