@@ -23,7 +23,12 @@ from ldaphelper.entry import LDAPEntry
 
 
 log = logging.getLogger(__name__)
-log.addHandler(logging.NullHandler())
+try:
+    log.addHandler(logging.NullHandler())
+except:
+    class NullHandler(logging.Handler):
+        def emit(self, record):
+            pass
 
 
 class LDAPHandler(object):
