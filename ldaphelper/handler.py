@@ -47,15 +47,17 @@ class LDAPHandler(object):
     :param binddn: DN to bind with, default is None (anonymous)
     :param secret: Secret to bind with, default is None (anonymous)
     :param timeout: Connection timeout
+    :param refferral: Whether to follow refferals or not, default always
     '''
 
-    def __init__(self, uri, binddn='', secret='', timeout=10, referrals=''):
+    def __init__(self, uri, binddn='', secret='', timeout=10,
+                 referral=ldap.DEREF_ALWAYS):
         self._ldap = None
         self._ldap_uri = uri
         self._ldap_binddn = binddn
         self._ldap_secret = secret
         self._ldap_timeout = timeout
-        self._ldap_referrals = referrals
+        self._ldap_referral = referral
         self._error = None
 
     def get_uri(self):
@@ -108,10 +110,8 @@ class LDAPHandler(object):
             ldap.set_option(ldap.OPT_PROTOCOL_VERSION, ldap.VERSION3)
             ldap.set_option(ldap.OPT_DEREF, ldap.DEREF_ALWAYS)
 
-            if self._ldap_referrals is None:
-                ldap.set_option(ldap.OPT_REFERRALS, ldap.DEREF_NEVER)
-            else:
-                ldap.set_option(ldap.OPT_REFERRALS, self._ldap_referrals)
+            if not self._ldap_referral == ldap.DEREF_ALWAYS:
+                ldap.set_option(ldap.OPT_REFERRALS, self._ldap_referral)
 
             if self._ldap_uri.startswith('ldaps'):
                 ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, 0)
