@@ -271,7 +271,6 @@ class LDAPHandler(object):
         for entry in entries:
             modlist = []
             try:
-                # TODO: Use dn2str instead of explode_dn
                 dn_str = entry.get_dn()
                 dn_obj = ldap.dn.str2dn(dn_str)
                 basedn = ','.join(ldap.dn.explode_dn(dn_str)[1:])

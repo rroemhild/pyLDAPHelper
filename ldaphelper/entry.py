@@ -131,10 +131,10 @@ class LDAPEntry(object):
         try:
             self._attrs[attr].remove(val)
         except ValueError:
-            log.warning('remove: Value \'%s\' not in attribute \'%s\'',
+            log.debug('remove: Value \'%s\' not in attribute \'%s\'',
                                                                     val, attr)
         except KeyError:
-            log.warning('remove: Attribute \'%s\' is not defined in %s',
+            log.debug('remove: Attribute \'%s\' is not defined in %s',
                                                                attr, self._dn)
 
     def delete(self, attr):
@@ -144,7 +144,7 @@ class LDAPEntry(object):
                 raise KeyError
             self._attrs[attr] = []
         except KeyError:
-            log.warning('delete: Attribute \'%s\' is not defined in %s',
+            log.debug('delete: Attribute \'%s\' is not defined in %s',
                                                                attr, self._dn)
 
     def attributes(self):
