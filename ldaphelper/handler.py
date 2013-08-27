@@ -272,10 +272,9 @@ class LDAPHandler(object):
             modlist = []
             try:
                 dn_str = entry.get_dn()
-                dn_obj = ldap.dn.str2dn(dn_str)
                 basedn = ','.join(ldap.dn.explode_dn(dn_str)[1:])
-                orig_dn = self.search(basedn, '(cn=%s)' % entry.get('cn'),
-                                      raw=True)
+                rdn = ldap.dn.explode_dn(dn_str)[:1][0]
+                orig_dn = self.search(basedn, rdn, raw=True)
             except Exception:
                 log.error('DN is not valid.')
                 # TODO: Raise error
