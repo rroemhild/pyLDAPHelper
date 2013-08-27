@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-'''
+"""
 ldaphelper.entry
 ~~~~~~~~~~~~~~~~
 
@@ -11,7 +11,7 @@ Part of pyLDAPHelper: A simple LDAP helper module
 
 :copyright: (c) 2012 Rafael Römhild
 :license: MIT, see LICENSE for more details.
-'''
+"""
 
 import sys
 import ldap
@@ -30,9 +30,7 @@ except:
 
 
 class LDAPEntry(object):
-
-    '''
-    Base class for LDAP entries.
+    """Base class for LDAP entries.
 
     Typical use pattern:
 
@@ -43,8 +41,8 @@ class LDAPEntry(object):
             print entry.get_dn()
 
     :param entry: An LDAP search result tuple (dn, entry).
-    '''
 
+    """
     def __init__(self, entry=list()):
         self._dn = ''
         self._attrs = ldap.cidict.cidict()
@@ -53,27 +51,20 @@ class LDAPEntry(object):
             self._update(entry)
 
     def __str__(self):
-        '''
-        Return the entry DN.
-        '''
+        """Return the entry DN."""
         return 'DN: %s' % self.get_dn()
 
     def _update(self, entry):
-        '''
-        Update object with a search result tuple (dn, entry).
-        '''
+        """Update object with a search result tuple (dn, entry)."""
         self._dn = entry[0]
         self._attrs.update(entry[1])
 
     def get_dn(self):
-        '''
-        Return the DN (distinguished name) from the entry.
-        '''
+        """Return the DN (distinguished name) from the entry."""
         return self._dn
 
     def get(self, attr, default=['']):
-        '''
-        Return the content from an attribute or default.
+        """Return the content from an attribute or default.
 
         Typical use pattern:
 
@@ -86,7 +77,8 @@ class LDAPEntry(object):
 
         :param attr: Attribute name
         :param default: Default value if attr does not exist.
-        '''
+
+        """
         try:
             val = self._attrs[attr]
             if len(val) < 1:
@@ -103,12 +95,12 @@ class LDAPEntry(object):
                 return [default]
 
     def set(self, attr, val):
-        '''
-        Set an attribute.
+        """Set an attribute.
 
         :param attr: LDAP attribute name
         :param val: Value as str or list
-        '''
+
+        """
         if isinstance(val, int):
             val = str(val)
 
@@ -120,9 +112,7 @@ class LDAPEntry(object):
             raise KeyError
 
     def append(self, attr, val):
-        '''
-        Add a value to an attribute.
-        '''
+        """Add a value to an attribute."""
         try:
             if not attr in self._attrs:
                 self.set(attr, val)
@@ -137,9 +127,7 @@ class LDAPEntry(object):
             raise KeyError
 
     def remove(self, attr, val):
-        '''
-        Remove a value from an attribute.
-        '''
+        """Remove a value from an attribute."""
         try:
             self._attrs[attr].remove(val)
         except ValueError:
@@ -150,9 +138,7 @@ class LDAPEntry(object):
                                                                attr, self._dn)
 
     def delete(self, attr):
-        '''
-        Remove an attribute from the entry.
-        '''
+        """Remove an attribute from the entry."""
         try:
             if not attr in self._attrs:
                 raise KeyError
@@ -162,15 +148,11 @@ class LDAPEntry(object):
                                                                attr, self._dn)
 
     def attributes(self):
-        '''
-        Return a list with all attributes.
-        '''
+        """Return a list with all attributes."""
         return self._attrs.keys()
 
     def set_dn(self, val):
-        '''
-        Set the DN for the entry.
-        '''
+        """Set the DN for the entry."""
         try:
             dn = ldap.dn.str2dn(val)
             self._dn = ldap.dn.dn2str(dn)
@@ -179,11 +161,11 @@ class LDAPEntry(object):
             log.error('set_dn: \'%s\' is not a valid DN', self._dn)
 
     def to_ldif(self, output_file=sys.stdout):
-        '''
-        Get an LDIF formated output from the LDAP entry.
+        """Get an LDIF formated output from the LDAP entry.
 
         :param output_file: Any filehandler object. Default is stdout.
-        '''
+
+        """
         ldif_writer = LDIFWriter(output_file)
         ldif_writer.unparse(self._dn, dict(self._attrs))
 

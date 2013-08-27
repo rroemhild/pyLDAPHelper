@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-'''
+"""
 ldaphelper.handler
 ~~~~~~~~~~~~~~~~~~
 
@@ -11,13 +11,14 @@ Part of LDAPHelper: A simple LDAP helper module
 
 :copyright: (c) 2012 Rafael Römhild
 :license: MIT, see LICENSE for more details.
-'''
+"""
+
+import logging
 
 import ldap
 import ldap.dn
 import ldap.filter
 import ldap.modlist
-import logging
 
 from ldaphelper.entry import LDAPEntry
 
@@ -32,9 +33,7 @@ except:
 
 
 class LDAPHandler(object):
-
-    '''
-    Class to handle the communication with an LDAP server.
+    """Handle the communication with an LDAP server.
 
     .. code-block:: python
 
@@ -48,8 +47,8 @@ class LDAPHandler(object):
     :param secret: Secret to bind with, default is None (anonymous)
     :param timeout: Connection timeout
     :param refferral: Whether to follow refferals or not, default always
-    '''
 
+    """
     def __init__(self, uri, binddn='', secret='', timeout=10,
                  referral=ldap.DEREF_ALWAYS):
         self._ldap = None
@@ -61,50 +60,43 @@ class LDAPHandler(object):
         self._error = None
 
     def get_uri(self):
-        '''
-        Return the LDAP URI for the object.
-        '''
+        """Return the LDAP URI for the object."""
         return self._ldap_uri
 
     def get_binddn(self):
-        '''
-        Return the binddn for the LDAP object.
-        '''
+        """Return the binddn for the LDAP object."""
         return self._ldap_binddn
 
     def get_error(self):
-        '''
-        Return the latest error message.
-        '''
+        """Return the latest error message."""
         return self._error
 
     def set_uri(self, val):
-        '''
-        Set a new URI. Use ldaps:// for TLS session.
+        """Set a new URI. Use ldaps:// for TLS session.
 
         :param val: A valid ldap URI (ldaps://localhost)
-        '''
+
+        """
         self._ldap_uri = val
 
     def set_binddn(self, val):
-        '''Set the binddn.
+        """Set the binddn.
 
         :param val: The DN to bind with the LDAP server.
-        '''
+
+        """
         self._ldap_binddn = val
 
     def set_secret(self, val):
-        '''
-        Set the secret for the bindDN.
+        """Set the secret for the bindDN.
 
         :param val: BindDN secret.
-        '''
+
+        """
         self._ldap_secret = val
 
     def bind(self):
-        '''
-        Setup the connection to the LDAP server.
-        '''
+        """Setup the connection to the LDAP server."""
         if not self._ldap:
             log.debug('Connect to LDAP Server %s.', self._ldap_uri)
             ldap.set_option(ldap.OPT_PROTOCOL_VERSION, ldap.VERSION3)
@@ -137,23 +129,21 @@ class LDAPHandler(object):
         return self._ldap
 
     def unbind(self):
-        '''
-        Disconnect from the LDAP server.
-        '''
+        """Disconnect from the LDAP server."""
         if self._ldap:
             log.debug('Disconnect from LDAP Server.')
             self._ldap.unbind_s()
             self._ldap = None
 
     def add(self, entry, modlist):
-        '''
-        Add an entry to the directory.
+        """Add an entry to the directory.
 
         This method normaly is called by the self.update() method.
 
         :param entry: The LDAPEntry object to modify.
         :param modlist: A modlist from ldap.modlist.modifyModlist
-        '''
+
+        """
         log.info('Add new LDAP entry: %s.', entry.get_dn())
         try:
             self.bind()
@@ -166,14 +156,14 @@ class LDAPHandler(object):
             log.error(self._error)
 
     def modify(self, entry, modlist):
-        '''
-        Modify an LDAP entry.
+        """Modify an LDAP entry.
 
         This method normaly is called by the self.update() method.
 
         :param entry: The LDAPEntry object to modify.
         :param modlist: A modlist from ldap.modlist.modifyModlist
-        '''
+
+        """
         log.info('Modify existing LDAP entry: %s.', entry.get_dn())
         try:
             self.bind()
@@ -187,12 +177,12 @@ class LDAPHandler(object):
             log.error(self._error)
 
     def delete(self, entry):
-        '''
-        Delete an entry from the directory.
+        """Delete an entry from the directory.
 
         :param entry: A LDAP entry tuple. Could be a ldaputils.entry.LDAPEntry
                       object or a string with an DN.
-        '''
+
+        """
         dn = None
         try:
             if isinstance(entry, str):
@@ -213,14 +203,14 @@ class LDAPHandler(object):
             log.error(self._error)
 
     def rename(self, dn, newrdn, newsuperior=None, delold=1):
-        '''
-        Moving a DN in the tree or rename the rdn.
+        """Moving a DN in the tree or rename the rdn.
 
         :param dn: DN from the entry to rename.
         :param newrdn: New RDN for the entry.
         :param newsuperior: New parent DN if move in the tree.
         :param delold: Keep or delete the old rdn as an attribute of the entry.
-        '''
+
+        """
         try:
             self.bind()
             self._ldap.rename_s(dn, newrdn, newsuperior, delold)
@@ -236,8 +226,7 @@ class LDAPHandler(object):
     def search(self, basedn, search_filter='(objectClass=*)',
                retrieve_attrs=list(), search_scope=ldap.SCOPE_SUBTREE,
                raw=False):
-        '''
-        Perform an LDAP search on the directory.
+        """Perform an LDAP search on the directory.
 
         :param basedn: The base as the DN of the entry at which
                        to start the search.
@@ -245,7 +234,8 @@ class LDAPHandler(object):
         :param retrieve_attrs: List of attributes to receive.
         :param search_scope: LDAP search scope. Default is SUBTREE.
         :param raw: Return the raw search result from ldap.search_s().
-        '''
+
+        """
         search_result = []
         log.debug('Perform LDAP search.')
         try:
@@ -270,11 +260,11 @@ class LDAPHandler(object):
         return map(LDAPEntry, search_result)
 
     def update(self, entries):
-        '''
-        Add or modify one ore more LDAPEntry objects.
+        """Add or modify one ore more LDAPEntry objects.
 
         :param entries: List with LDAPEntry objects or a single LDAPEntry.
-        '''
+
+        """
         if not isinstance(entries, list):
             entries = [entries]
 
@@ -282,9 +272,11 @@ class LDAPHandler(object):
             modlist = []
             try:
                 # TODO: Use dn2str instead of explode_dn
-                explode_dn = ldap.explode_dn(entry.get_dn())
-                orig_dn = self.search(','.join(explode_dn[1:]), '(%s)' %
-                                      explode_dn[:1][0], raw=True)
+                dn_str = entry.get_dn()
+                dn_obj = ldap.dn.str2dn(dn_str)
+                basedn = ','.join(ldap.dn.explode_dn(dn_str)[1:])
+                orig_dn = self.search(basedn, '(cn=%s)' % entry.get('cn'),
+                                      raw=True)
             except Exception:
                 log.error('DN is not valid.')
                 # TODO: Raise error
