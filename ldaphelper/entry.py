@@ -114,14 +114,9 @@ class LDAPEntry(object):
     def append(self, attr, val):
         """Add a value to an attribute."""
         try:
-            if not attr in self._attrs:
-                self.set(attr, val)
-                log.debug('append: Add new attr \'%s\' with val \'%s\'.',
-                                                                    val, attr)
-            else:
-                if val not in self._attrs[attr]:
-                    self._attrs[attr].append(val)
-                    log.debug('append: Add \'%s\' to \'%s\'.', val, attr)
+            if val not in self._attrs[attr]:
+                self._attrs[attr].append(val)
+                log.debug('append: Add \'%s\' to \'%s\'.', val, attr)
         except KeyError:
             log.error('append: Attribute \'%s\' is not defined in %s',
                                                                attr, self._dn)
