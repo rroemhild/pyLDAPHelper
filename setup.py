@@ -27,7 +27,7 @@ setup(
     url = 'http://github.com/rroemhild/pyLDAPHelper',
     keywords = ['ldap'],
     long_description = '__doc__',
-    install_requires = ['python-ldap == 2.4.13'],
+    install_requires = ['python-ldap >= 2.4.13'],
     classifiers = [
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
