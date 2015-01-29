@@ -149,7 +149,7 @@ class LDAPHandler(object):
             self.bind()
             self._ldap.add_s(entry.get_dn(), modlist)
         except ldap.LDAPError, error:
-            self._error =  'LDAP add entry error: %s.' % error
+            self._error = 'LDAP add entry error: %s.' % error
             log.error(self._error)
         except ldap.SERVER_DOWN:
             self._error = 'LDAP Server %s down.' % self._ldap_uri
@@ -259,10 +259,11 @@ class LDAPHandler(object):
 
         return map(LDAPEntry, search_result)
 
-    def update(self, entries):
+    def update(self, entries, dry_run=False):
         """Add or modify one ore more LDAPEntry objects.
 
         :param entries: List with LDAPEntry objects or a single LDAPEntry.
+        :param dry_run: If True perform a trial run with no changes made.
 
         """
         if not isinstance(entries, list):

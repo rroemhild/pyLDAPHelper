@@ -1,6 +1,8 @@
 pyLDAPHelper
 ############
 
+!DO NOT USE THIS PACKAGE! It's buggy and not well designed. I just used this to learn python-ldap. There are better python/ldap packages out there.
+
 ``ldaphelper`` is a simple Python module/package based on
 `python-ldap <http://www.python-ldap.org/>`_ that make my Life as an LDAP
 operator easier. I use it in a lot of scripts for automatic or
@@ -27,7 +29,7 @@ From Github
 
 Get the latest code from Github::
 
-    pip install -r http://github.com/rroemhild/pyLDAPHelper/raw/master/requirements_pip.txt
+    pip install -r http://github.com/rroemhild/pyLDAPHelper/raw/master/requirements.txt
 
 
 Examples

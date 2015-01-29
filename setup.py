@@ -13,12 +13,11 @@ dealing with LDAP server based on python-ldap.
 """
 
 from setuptools import setup
-from ldaphelper.version import __version__
 
 
 setup(
     name = 'ldaphelper',
-    version = __version__,
+    version = '0.1.1',
     author = 'Rafael Römhild',
     author_email = 'rafael@roemhild.de',
     description = 'Simple helper module for python-ldap.',
@@ -27,9 +26,9 @@ setup(
     url = 'http://github.com/rroemhild/pyLDAPHelper',
     keywords = ['ldap'],
     long_description = '__doc__',
-    install_requires = ['python-ldap >= 2.4.13'],
+    install_requires = ['python-ldap >= 2.4.19'],
     classifiers = [
-        'Development Status :: 4 - Beta',
+        'Development Status :: 7 - Inactive',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
